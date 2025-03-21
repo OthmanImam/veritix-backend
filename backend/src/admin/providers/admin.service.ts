@@ -1,136 +1,3 @@
-// import { Injectable, NotFoundException } from '@nestjs/common';
-// import { Repository } from 'typeorm';
-// import { InjectRepository } from '@nestjs/typeorm';
-// import { Admin } from '../entities/admin.entity';
-// import { CreateAdminDto } from '../dto/create-admin.dto';
-// import { UpdateAdminDto } from '../dto/update-admin.dto';
-// import * as bcrypt from 'bcrypt';
-
-// @Injectable()
-// export class AdminService {
-//   constructor(
-//     @InjectRepository(Admin)
-//     private readonly adminRepository: Repository<Admin>,
-//   ) {}
-
-//   async createAdmin(createAdminDto: CreateAdminDto) {
-//     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-//     const hashedPassword = await bcrypt.hash(createAdminDto.password, 10);
-
-//     const newAdmin = this.adminRepository.create({
-//       ...createAdminDto,
-//       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//       password: hashedPassword,
-//     });
-
-//     const savedAdmin = await this.adminRepository.save(newAdmin);
-
-//     return {
-//       message: 'Admin created successfully',
-//       adminId: savedAdmin.id,
-//     };
-//   }
-
-//   async findAll(): Promise<Partial<Admin>[]> {
-//     return this.adminRepository.find({
-//       select: ['id', 'firstName', 'lastName', 'role', 'email'],
-//     });
-//   }
-
-//   async findOne(id: number): Promise<Partial<Admin>> {
-//     const admin = await this.adminRepository.findOne({
-//       where: { id },
-//       select: ['id', 'firstName', 'lastName', 'role', 'email'],
-//     });
-
-//     if (!admin) {
-//       throw new NotFoundException(`Admin with ID ${id} not found`);
-//     }
-//     return admin;
-//   }
-
-//   async findOneByEmail(email: string): Promise<Admin | undefined> {
-//     return this.adminRepository.findOne({ where: { email } });
-//   }
-
-//   async findOneById(id: number): Promise<Admin | undefined> {
-//     return this.adminRepository.findOne({ where: { id } });
-//   }
-
-//   async update(id: number, updateAdminDto: UpdateAdminDto) {
-//     const admin = await this.adminRepository.findOne({ where: { id } });
-
-//     if (!admin) {
-//       throw new NotFoundException('Admin not found');
-//     }
-
-//     if (updateAdminDto.password) {
-//       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-//       updateAdminDto.password = await bcrypt.hash(updateAdminDto.password, 10);
-//     }
-
-//     await this.adminRepository.update(id, updateAdminDto);
-
-//     return {
-//       message: 'Admin details updated successfully',
-//       adminId: id,
-//     };
-//   }
-
-//   async remove(id: number) {
-//     const admin = await this.adminRepository.findOne({ where: { id } });
-
-//     if (!admin) {
-//       throw new NotFoundException('Admin not found');
-//     }
-
-//     await this.adminRepository.delete(id);
-
-//     return { message: 'Admin deleted successfully', adminId: id };
-//   }
-
-//   async setRefreshToken(id: number, refreshToken: string): Promise<void> {
-//     await this.adminRepository.update(id, { refreshToken });
-//   }
-
-//   async setResetToken(
-//     id: number,
-//     resetToken: string,
-//     resetTokenExpiry: Date,
-//   ): Promise<void> {
-//     await this.adminRepository.update(id, { resetToken, resetTokenExpiry });
-//   }
-
-//   async updatePassword(id: number, password: string): Promise<void> {
-//     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-//     const hashedPassword = await bcrypt.hash(password, 10);
-//     await this.adminRepository.update(id, {
-//       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-//       password: hashedPassword,
-//       resetToken: null,
-//       resetTokenExpiry: null,
-//     });
-//   }
-
-//   async setVerificationToken(
-//     id: number,
-//     verificationToken: string,
-//     verificationTokenExpiry: Date,
-//   ): Promise<void> {
-//     await this.adminRepository.update(id, {
-//       verificationToken,
-//       verificationTokenExpiry,
-//     });
-//   }
-
-//   async verifyEmail(id: number): Promise<void> {
-//     await this.adminRepository.update(id, {
-//       emailVerified: true,
-//       verificationToken: null,
-//       verificationTokenExpiry: null,
-//     });
-//   }
-// }
 import { Injectable, Logger } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import type { Repository } from "typeorm"
@@ -141,17 +8,42 @@ import { User } from "src/users/entities/user.entity"
 import type { UserResponseDto } from "../dto/user-response.dto"
 import type { ReportFilterDto } from "../dto/report-filter.dto"
 import type { ReportResponseDto } from "../dto/report-response.dto"
+import { Admin } from "../entities/admin.entity"
 
 
 @Injectable()
 export class AdminService {
+  setResetToken(id: number, resetTokenHash: string, resetTokenExpiry: Date) {
+    throw new Error('Method not implemented.')
+  }
+  updatePassword(id: number, hashedPassword: string) {
+    throw new Error('Method not implemented.')
+  }
+  findOneById(adminId: number) {
+    throw new Error('Method not implemented.')
+  }
+  setVerificationToken(id: any, tokenHash: string, tokenExpiry: Date) {
+    throw new Error('Method not implemented.')
+  }
+  verifyEmail(id: number) {
+    throw new Error('Method not implemented.')
+  }
   private readonly logger = new Logger(AdminService.name);
 
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Admin)
+    private readonly adminRepository: Repository<Admin>,
   ) {}
 
+  async findOneByEmail(email: string): Promise<Admin | undefined> {
+    return this.adminRepository.findOne({ where: { email } });
+  }
+
+  async setRefreshToken(id: number, refreshToken: string): Promise<void> {
+    await this.adminRepository.update(id, { refreshToken });
+  }
   async findAllUsers(): Promise<UserResponseDto[]> {
     try {
       this.logger.log("Retrieving all users")
@@ -275,6 +167,8 @@ export class AdminService {
       isActive: user.isActive,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      refreshToken: null, // TODO: Implement refresh token retrieval and mapping
+
     }
   }
 

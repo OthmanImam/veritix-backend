@@ -56,5 +56,7 @@ export class UserResponseDto {
     description: "Date and time when the user was last updated",
   })
   updatedAt: Date
+  
+  refreshToken: any
 }
 
